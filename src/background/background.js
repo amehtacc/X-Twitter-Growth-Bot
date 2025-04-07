@@ -1,4 +1,3 @@
-// src/background/background.js
 console.log("✅ Background service worker loaded");
 
 import { toggleAutoTweeting } from "../scripts/auto_tweet_manager.js";
