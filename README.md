@@ -20,8 +20,8 @@ An AI-powered Chrome extension that **automatically generates and posts tweets**
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/xgrowthbot.git
-cd xgrowthbot
+git clone https://github.com/amehtacc/X-Twitter-Growth-Bot.git
+cd X-Twitter-Growth-Bot
 ```
 
 2. Build the extension:
@@ -86,7 +86,8 @@ src/
 │   └── prompt.js
 │
 ├── index.css                # Popup styles
-├── index.jsx                # Entry point
+├── main.jsx                 # Entry point
+├── index.html               # after build convert it into popup.html 
 └── manifest.json            # Chrome Extension manifest
 ```
 
@@ -143,5 +144,5 @@ Build with ❤️ by [Aryan Mehta](https://aryanmehta.netlify.app/) - feel free 
 
 ## 📄 License
 
-MIT © 2025 [YourName]
+MIT © 2025 [Aryan Mehta]
 
