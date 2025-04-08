@@ -48,7 +48,7 @@ export async function tweetNow(topics) {
             } else {
               console.warn("⚠️ Tweet button not found or disabled");
             }
-          }, 10000);
+          }, 2000);
         },
         args: [tweet],
       });
