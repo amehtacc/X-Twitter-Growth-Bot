@@ -1,27 +1,31 @@
+// Importing necessary React hooks and external libraries
 import React, { useEffect, useState } from "react";
-import { Save, Power } from "lucide-react";
-import { toast } from "react-toastify";
+import { Save, Power } from "lucide-react"; // Icon components
+import { toast } from "react-toastify"; // Notification/toast alerts
 
+// Popup component for Chrome Extension settings UI
 function Popup() {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [tweetFrequency, setTweetFrequency] = useState("");
-  const [topics, setTopics] = useState("");
-  const [apiKey, setApiKey] = useState("");
-  const [viewPassword, setViewPassword] = useState(false);
+  // State variables for settings and input values
+  const [isEnabled, setIsEnabled] = useState(false); // Toggle for bot status
+  const [tweetFrequency, setTweetFrequency] = useState(""); // Tweet interval
+  const [topics, setTopics] = useState(""); // Tweet topics
+  const [apiKey, setApiKey] = useState(""); // Gemini API key
+  const [viewPassword, setViewPassword] = useState(false); // Show/hide API key
 
+  // Handles tweet frequency dropdown change
   function handleFrequency(e) {
     setTweetFrequency(e.target.value);
   }
 
+  // Handles API key input change
   function handleApiKey(e) {
     setApiKey(e.target.value);
   }
 
+  // Save all user settings to Chrome sync storage or localStorage
   function saveSettings() {
     if (!tweetFrequency || !topics) {
-      toast.error(
-        "Oops! Don't forget to fill in all the fields before saving."
-      );
+      toast.error("Oops! Don't forget to fill in all the fields before saving.");
       return;
     }
 
@@ -30,19 +34,16 @@ function Popup() {
       return;
     }
 
-    const settings = {
-      tweetFrequency,
-      topics,
-      apiKey,
-      isEnabled,
-    };
+    const settings = { tweetFrequency, topics, apiKey, isEnabled };
 
     try {
-      if (chrome?.storage?.sync) {
-        chrome.storage.sync.set({ xGrowthBotSettings: settings }, () => {
+      // Save settings in Chrome sync storage if available
+      if (chrome?.storage?.local) {
+        chrome.storage.local.set({ xGrowthBotSettings: settings }, () => {
           toast.success("Settings saved! ✅");
         });
       } else {
+        // Fallback to localStorage
         localStorage.setItem("xGrowthBotSettings", JSON.stringify(settings));
         toast.success("Settings saved locally ✅");
       }
@@ -52,22 +53,23 @@ function Popup() {
     }
   }
 
+  // Toggles the bot enable/disable state
   function handleIsEnable() {
     const updateEnabledStatus = (settings) => {
       if (!settings.tweetFrequency || !settings.topics || !settings.apiKey) {
         toast.error("Oops! Don't forget to save all the details before start.");
         return;
       }
-  
+
       const newStatus = !isEnabled;
       setIsEnabled(newStatus);
       toast(newStatus ? "Bot is active! ✅" : "Bot is Disabled!");
-  
+
       const updated = { ...settings, isEnabled: newStatus };
-  
+
       try {
-        if (chrome?.storage?.sync) {
-          chrome.storage.sync.set({ xGrowthBotSettings: updated });
+        if (chrome?.storage?.local) {
+          chrome.storage.local.set({ xGrowthBotSettings: updated });
         } else {
           localStorage.setItem("xGrowthBotSettings", JSON.stringify(updated));
         }
@@ -75,23 +77,23 @@ function Popup() {
         console.error("Failed to update isEnabled:", err);
       }
     };
-  
-    if (chrome?.storage?.sync) {
-      chrome.storage.sync.get("xGrowthBotSettings", (result) => {
+
+    // Get existing settings to update isEnabled status
+    if (chrome?.storage?.local) {
+      chrome.storage.local.get("xGrowthBotSettings", (result) => {
         updateEnabledStatus(result.xGrowthBotSettings || {});
       });
     } else {
-      const settings =
-        JSON.parse(localStorage.getItem("xGrowthBotSettings")) || {};
+      const settings = JSON.parse(localStorage.getItem("xGrowthBotSettings")) || {};
       updateEnabledStatus(settings);
     }
   }
-  
 
+  // Load saved settings from Chrome sync/localStorage on mount
   useEffect(() => {
     try {
-      if (chrome?.storage?.sync) {
-        chrome.storage.sync.get("xGrowthBotSettings", (result) => {
+      if (chrome?.storage?.local) {
+        chrome.storage.local.get("xGrowthBotSettings", (result) => {
           const savedSettings = result?.xGrowthBotSettings;
           if (savedSettings) {
             setIsEnabled(savedSettings.isEnabled || false);
@@ -101,9 +103,7 @@ function Popup() {
           }
         });
       } else {
-        const savedSettings = JSON.parse(
-          localStorage.getItem("xGrowthBotSettings")
-        );
+        const savedSettings = JSON.parse(localStorage.getItem("xGrowthBotSettings"));
         if (savedSettings) {
           setIsEnabled(savedSettings.isEnabled || false);
           setTweetFrequency(savedSettings.tweetFrequency || "");
@@ -116,8 +116,10 @@ function Popup() {
     }
   }, []);
 
+  // UI for the settings popup
   return (
     <div className="w-[350px] bg-white text-gray-900 p-7 rounded-xl flex flex-col gap-4 border-2 border-gray-300">
+      {/* Header */}
       <div className="text-center pb-2 border-b border-gray-200">
         <h1 className="text-xl font-bold">X Growth Bot</h1>
         <p className="text-xs text-gray-500">
@@ -125,6 +127,7 @@ function Popup() {
         </p>
       </div>
 
+      {/* Bot status and toggle button */}
       <div className="flex justify-between items-center">
         <span
           className={`border border-gray-500 py-1 px-3 text-xs font-bold rounded-2xl ${
@@ -148,6 +151,7 @@ function Popup() {
         </button>
       </div>
 
+      {/* Tweet frequency selector */}
       <div className="flex flex-col gap-2 mt-1">
         <label htmlFor="tweet-frequency" className="text-sm font-medium">
           Tweet Frequency
@@ -168,6 +172,7 @@ function Popup() {
         </select>
       </div>
 
+      {/* Topics input */}
       <div className="flex flex-col gap-2 mt-1">
         <label htmlFor="topics" className="text-sm font-medium">
           Topics (comma-separated)
@@ -182,6 +187,7 @@ function Popup() {
         />
       </div>
 
+      {/* API key input with show/hide toggle */}
       <div className="flex flex-col gap-2 mt-1">
         <div className="flex justify-between items-center">
           <label htmlFor="api-key" className="text-sm font-medium">
@@ -216,6 +222,7 @@ function Popup() {
         </div>
       </div>
 
+      {/* Save settings button */}
       <div>
         <button
           onClick={saveSettings}
