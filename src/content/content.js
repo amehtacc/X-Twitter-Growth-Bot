@@ -53,7 +53,7 @@ function injectToggleButton() {
         const newStatus = !currentSettings.isEnabled;
 
         // Save the updated status back to local storage
-        chrome.storage.sync.local({
+        chrome.storage.local.set({
           xGrowthBotSettings: {
             ...currentSettings,
             isEnabled: newStatus,
